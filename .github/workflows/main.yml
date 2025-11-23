@@ -1,1 +1,41 @@
+name: Bank Churn - MLflow CI Workflow
+
+on:
+push:
+branches:
+- main
+workflow_dispatch:
+
+jobs:
+retrain-model:
+runs-on: ubuntu-latest
+
+steps:
+  # Step 1: Checkout kode project
+  - name: Checkout repository
+    uses: actions/checkout@v4
+
+  # Step 2: Setup environment dengan Miniconda
+  - name: Setup Miniconda
+    uses: conda-incubator/setup-miniconda@v3
+    with:
+      python-version: "3.12"
+      auto-activate-base: true
+
+  # Step 3: Install MLflow di environment base
+  - name: Install MLflow package
+    shell: bash -l {0}
+    run: pip install mlflow==2.19.0
+
+  # Step 4: Jalankan MLflow Project untuk retraining
+  - name: Run MLflow Project
+    shell: bash -l {0}
+    run: mlflow run ./MLProject --experiment-name "Bank_Churn_CI_Workflow"
+
+  # Step 5: Upload artefak training ke GitHub Actions
+  - name: Upload MLflow artefacts
+    uses: actions/upload-artifact@v4
+    with:
+      name: mlruns-artifacts
+      path: mlruns/
 
